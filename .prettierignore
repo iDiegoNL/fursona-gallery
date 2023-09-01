@@ -1,0 +1,10 @@
+node_modules/
+public/
+storage/
+.github/
+package.json
+package-lock.json
+composer.json
+composer.lock
+docker-compose.yml
+README.md

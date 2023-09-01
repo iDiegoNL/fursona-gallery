@@ -1,0 +1,16 @@
+@import '../../node_modules/inter-ui/inter.css';
+@import '../../node_modules/tippy.js/dist/tippy.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+    font-family: "Inter", "system-ui";
+}
+
+@supports (font-variation-settings: normal) {
+    html {
+        font-family: "Inter var", "system-ui";
+    }
+}

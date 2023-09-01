@@ -1,0 +1,59 @@
+name: Laravel
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  laravel-tests:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - uses: actions/checkout@v3
+        with:
+          # Make sure the actual branch is checked out when running on pull requests
+          ref: ${{ github.head_ref }}
+
+      - name: Copy .env
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+      - name: Install Composer dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Install NPM dependencies
+        run: npm install
+
+      - name: Generate key
+        run: php artisan key:generate
+
+      - name: Directory permissions
+        run: chmod -R 777 storage bootstrap/cache
+
+      - name: Create Database
+        run: |
+          mkdir -p database
+          touch database/database.sqlite
+
+      - name: Run Laravel Pint
+        run: vendor/bin/pint --test
+
+      - name: Prettify code
+        uses: creyD/prettier_action@v4.3
+        with:
+          prettier_options: --write resources/**/*.blade.php
+
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse
+
+      - name: Execute tests (Unit and Feature tests) via Pest
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+        run: vendor/bin/pest --parallel --order-by random
